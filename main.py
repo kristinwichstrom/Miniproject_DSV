@@ -11,11 +11,9 @@ import plotly.express as px
 #def run():
     #print (mb.get())
 
-# Read csv files
-vacdata = pd.read_csv("/Users/mawi/Documents/data_vaccinations/country_vaccinations.csv")
-popdata = pd.read_csv("/Users/mawi/Documents/population_by_country_2020.csv")
-#numpyvacdata = np.genfromtxt("/Users/mawi/Documents/data_vaccinations/country_vaccinations.csv",
-                             #names=True, delimiter=",", usecols=range(14)).reshape(14,-1)
+# Read csv files no paths pwease! Just keep data in seperate data folder
+vacdata = pd.read_csv('data/country_vaccinations.csv')
+popdata = pd.read_csv("data/population_by_country_2020.csv")
 
 
 #cleanup
@@ -112,19 +110,26 @@ predictbutton = Button(mainframe, text="Predict!").grid(row=6, column=0)
 
 # Graph for specific country
 
-#specific_country = []
-#for i in vacdata:
-#    if i == tkvar.get():
-#        specific_country.append(i)
+do_it_for_all_countries = True
+
+def interpolate_country(df, country):
+
+    firs = df.loc[df['country'] == country, 'people_fully_vaccinated'].index[0]
+    col = df.columns.get_loc('people_fully_vaccinated')
+    df.iloc[firs, col] = 0
+    specific_col = 'people_fully_vaccinated'
+    return df.loc[vacdata['country'] == country, specific_col].interpolate(limit_direction='both', limit = df.shape[0])
 
 
-specific_country = [vacdata.loc[vacdata.country == 'Denmark']]
-specific_country.set_value(0, 'people_fully_vaccinated', 0)
-vacdata.loc[vacdata['country']=='Denmark']['people_fully_vaccinated'].astype(float).interpolate().astype(int)
+# This could be better
+if do_it_for_all_countries:
+    for country in vacdata['country'].unique():
+        vacdata.loc[vacdata['country'] == country, 'people_fully_vaccinated'] = interpolate_country(vacdata, country)
+else:
+    vacdata.loc[vacdata['country'] == 'Denmark', 'people_fully_vaccinated'] = interpolate_country(vacdata, 'Denmark')
 
 
-result = pd.concat(specific_country)
-fig = px.line(result, x='date', y='people_fully_vaccinated', color='country')
+fig = px.line(vacdata, x='date', y='people_fully_vaccinated', color='country')
 
 fig.update_layout(
     title={
