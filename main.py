@@ -15,6 +15,9 @@ import plotly.express as px
 vacdata = pd.read_csv('data/country_vaccinations.csv')
 popdata = pd.read_csv("data/population_by_country_2020.csv")
 
+#quick information on the entire dataset
+#print('shape of data is:',vacdata.shape)
+#vacdata.info()
 
 #cleanup
 
@@ -50,6 +53,8 @@ dropListPop = ['Yearly Change', 'Net Change', 'Density (P/Km²)', 'Land Area (Km
 
 clean_data_vac.removeCols(dropListVac)
 clean_data_pop.removeCols(dropListPop)
+
+print('missing numbers of vaccination:',vacdata.isnull().sum())
 
 # Prep for dropdown menu
 countries = popdata_new.country.to_list()
