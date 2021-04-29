@@ -6,6 +6,12 @@ from tkinter import *
 from DataClean import *
 import matplotlib.pyplot as plt
 import plotly.express as px
+from sklearn import linear_model
+#import seaborn as sns
+#import missingno as msno
+import plotly.graph_objects as go
+from sklearn.linear_model import LinearRegression
+
 
 # Instantiate root window
 #def run():
@@ -13,7 +19,8 @@ import plotly.express as px
 
 # Read csv files no paths pwease! Just keep data in seperate data folder
 vacdata = pd.read_csv('data/country_vaccinations.csv')
-popdata = pd.read_csv("data/population_by_country_2020.csv")
+popdata = pd.read_csv('data/population_by_country_2020.csv')
+
 
 
 #cleanup
@@ -57,6 +64,11 @@ sorted_pop = sorted(countries)
 
 # Group data
 people_fully_vaccinated = vacdata.groupby(by=['country'], sort=False, as_index=False)['people_fully_vaccinated'].max()
+
+
+# merge datasets
+mergedata = pd.merge(vacdata, popdata_new)
+#print(mergedata.head(10))
 
 #how many countries are
 #print("grouped data:")
@@ -118,7 +130,7 @@ def interpolate_country(df, country):
     col = df.columns.get_loc('people_fully_vaccinated')
     df.iloc[firs, col] = 0
     specific_col = 'people_fully_vaccinated'
-    return df.loc[vacdata['country'] == country, specific_col].interpolate(limit_direction='both', limit = df.shape[0])
+    return df.loc[vacdata['country'] == country, specific_col].interpolate(limit_direction='both', limit=df.shape[0])
 
 
 # This could be better
@@ -143,6 +155,55 @@ fig.update_layout(
 
 fig.show()
 
+"""
+X = mergedata[['people_fully_vaccinated', 'population']]
+Y = mergedata['date']
+
+regr = linear_model.LinearRegression()
+regr.fit(X,Y)
+
+print('Intercept: \n', regr.intercept_)
+print('Coefficients: \n', regr.coef_)
+
+pvac = 2000000
+pop = 5000000
+print('Predicted date for full vaccination: \n', regr.predict([[pvac, pop]]))
+"""
+
+
+#vacdata['date']=pd.to_datetime(vacdata['date'])
+#dt = vacdata.groupby('date').sum()
+
+#date difference
+#dt['date_diff']=dt['people_fully_vaccinated']
+#count=0
+#for index, row in dt.iterrows():
+#    row['date_diff']=count
+#    count+=1
+
+
+"""
+#creating the model
+model=LinearRegression()
+#print(type(vacdata['date']))
+
+X = mergedata[['people_fully_vaccinated']]
+y = mergedata['date']
+model.fit(X, y)
+print(model.coef_)
+print(model.intercept_)
+
+# 1 year prediction
+pr = model.predict(X)
+fig, ax = plt.subplots(figsize=(15, 5))
+plt.title('The Best Fit Line: ')
+plt.scatter(X=mergedata['people_fully_vaccinated'], y=mergedata['date'])
+plt.plot(X, pr)
+
+predictsomething = model.predict([[100000]])
+print(predictsomething)
+
+"""
 
 # graph for all countries
 #fig = px.line(result, x='date', y='people_fully_vaccinated', color='country')
