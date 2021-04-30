@@ -22,9 +22,6 @@ vacdata = pd.read_csv('data/country_vaccinations.csv')
 popdata = pd.read_csv('data/population_by_country_2020.csv')
 
 
-#quick information on the entire dataset
-#print('shape of data is:',vacdata.shape)
-#vacdata.info()
 
 #cleanup
 
@@ -61,8 +58,6 @@ dropListPop = ['Yearly Change', 'Net Change', 'Density (P/Km²)', 'Land Area (Km
 clean_data_vac.removeCols(dropListVac)
 clean_data_pop.removeCols(dropListPop)
 
-print('missing numbers of vaccination:',vacdata.isnull().sum())
-
 # Prep for dropdown menu
 countries = popdata_new.country.to_list()
 sorted_pop = sorted(countries)
@@ -73,6 +68,13 @@ people_fully_vaccinated = vacdata.groupby(by=['country'], sort=False, as_index=F
 
 # merge datasets
 mergedata = pd.merge(vacdata, popdata_new)
+mergedata_san = mergedata.dropna()
+mergedata_san['vaccinated_percent'] = mergedata_san['people_fully_vaccinated'].div(mergedata_san['population'])
+mergedata_san = mergedata_san.round(5)
+mergedata_san = mergedata_san.drop(['population', 'people_fully_vaccinated'], axis=1)
+print(mergedata_san.head(100))
+
+
 #print(mergedata.head(10))
 
 #how many countries are
@@ -163,13 +165,10 @@ fig.show()
 """
 X = mergedata[['people_fully_vaccinated', 'population']]
 Y = mergedata['date']
-
 regr = linear_model.LinearRegression()
 regr.fit(X,Y)
-
 print('Intercept: \n', regr.intercept_)
 print('Coefficients: \n', regr.coef_)
-
 pvac = 2000000
 pop = 5000000
 print('Predicted date for full vaccination: \n', regr.predict([[pvac, pop]]))
@@ -191,23 +190,19 @@ print('Predicted date for full vaccination: \n', regr.predict([[pvac, pop]]))
 #creating the model
 model=LinearRegression()
 #print(type(vacdata['date']))
-
 X = mergedata[['people_fully_vaccinated']]
 y = mergedata['date']
 model.fit(X, y)
 print(model.coef_)
 print(model.intercept_)
-
 # 1 year prediction
 pr = model.predict(X)
 fig, ax = plt.subplots(figsize=(15, 5))
 plt.title('The Best Fit Line: ')
 plt.scatter(X=mergedata['people_fully_vaccinated'], y=mergedata['date'])
 plt.plot(X, pr)
-
 predictsomething = model.predict([[100000]])
 print(predictsomething)
-
 """
 
 # graph for all countries
