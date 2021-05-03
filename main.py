@@ -150,7 +150,7 @@ if do_it_for_all_countries:
         vacdata.loc[vacdata['country'] == country, 'people_fully_vaccinated'] = interpolate_country(vacdata, country)
 else:
     vacdata.loc[vacdata['country'] == 'Denmark', 'people_fully_vaccinated'] = interpolate_country(vacdata, 'Denmark')
-
+# hej
 #
 #
 fig = px.line(mergedata_san, x='date', y='vaccinated_percent', color='country')
