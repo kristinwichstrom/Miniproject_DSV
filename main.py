@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 import pandas as pd
 import numpy as np
-
 from tkinter import *
 from DataClean import *
 import matplotlib.pyplot as plt
 import plotly.express as px
 from sklearn import linear_model
-#import seaborn as sns
-#import missingno as msno
 import plotly.graph_objects as go
 from sklearn.linear_model import LinearRegression
 
@@ -65,29 +62,13 @@ sorted_pop = sorted(countries)
 # Group data
 people_fully_vaccinated = vacdata.groupby(by=['country'], sort=False, as_index=False)['people_fully_vaccinated'].max()
 
-
-# merge datasets
+# Merge datasets
 mergedata = pd.merge(vacdata, popdata_new)
 mergedata_san = mergedata.dropna()
 mergedata_san['vaccinated_percent'] = mergedata_san['people_fully_vaccinated'].div(mergedata_san['population'])
 mergedata_san = mergedata_san.round(5)
 mergedata_san = mergedata_san.drop(['population', 'people_fully_vaccinated'], axis=1)
 print(mergedata_san.head(100))
-
-
-#print(mergedata.head(10))
-
-#how many countries are
-#print("grouped data:")
-#print(people_fully_vaccinated.head(10))
-
-#print("vaccination data:")
-#print(vacdata.head(10))
-#print("population data:")
-#print(popdata_new.head(10))
-
-#clean_data_pop.combineDataSets(people_fully_vaccinated)
-
 
 # GUI
 root = Tk()
@@ -148,50 +129,29 @@ else:
     vacdata.loc[vacdata['country'] == 'Denmark', 'people_fully_vaccinated'] = interpolate_country(vacdata, 'Denmark')
 
 
-fig = px.line(vacdata, x='date', y='people_fully_vaccinated', color='country')
+fig = px.line(mergedata_san, x='date', y='vaccinated_percent', color='country')
 
 fig.update_layout(
     title={
-            'text': "People fully vaccinated",
+            'text': "Vaccinated percent",
             'y':0.95,
             'x':0.5
     },
     xaxis_title="Date",
-    yaxis_title="Vaccinations"
+    yaxis_title="Vaccinations percent"
 )
 
 fig.show()
 
-"""
-X = mergedata[['people_fully_vaccinated', 'population']]
-Y = mergedata['date']
-regr = linear_model.LinearRegression()
-regr.fit(X,Y)
-print('Intercept: \n', regr.intercept_)
-print('Coefficients: \n', regr.coef_)
-pvac = 2000000
-pop = 5000000
-print('Predicted date for full vaccination: \n', regr.predict([[pvac, pop]]))
-"""
 
-
-#vacdata['date']=pd.to_datetime(vacdata['date'])
-#dt = vacdata.groupby('date').sum()
-
-#date difference
-#dt['date_diff']=dt['people_fully_vaccinated']
-#count=0
-#for index, row in dt.iterrows():
-#    row['date_diff']=count
-#    count+=1
 
 
 """
 #creating the model
 model=LinearRegression()
 #print(type(vacdata['date']))
-X = mergedata[['people_fully_vaccinated']]
-y = mergedata['date']
+X = mergedata.san[['people_fully_vaccinated']]
+y = mergedata.san['date']
 model.fit(X, y)
 print(model.coef_)
 print(model.intercept_)
@@ -199,28 +159,10 @@ print(model.intercept_)
 pr = model.predict(X)
 fig, ax = plt.subplots(figsize=(15, 5))
 plt.title('The Best Fit Line: ')
-plt.scatter(X=mergedata['people_fully_vaccinated'], y=mergedata['date'])
+plt.scatter(X=mergedata.san['people_fully_vaccinated'], y=mergedata.san['date'])
 plt.plot(X, pr)
 predictsomething = model.predict([[100000]])
 print(predictsomething)
 """
-
-# graph for all countries
-#fig = px.line(result, x='date', y='people_fully_vaccinated', color='country')
-
-#fig.update_layout(
- #   title={
-  #          'text': "People fully vaccinated",
-   #         'y':0.95,
-    #        'x':0.5
-     #   },
-    #xaxis_title="Date",
-    #yaxis_title="Vaccinations"
-#)
-#fig.show()
-
-
-#for i in countries:
- #   i = mb.menu.add_checkbutton(label=i, variable=i)
 
 root.mainloop()
