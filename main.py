@@ -105,6 +105,30 @@ def change_dropdown(*args):
 
 predictbutton = Button(mainframe, text="Predict!").grid(row=6, column=0)
 
+# Graph for specific country
+#Only denmark
+#denmark_vaccinated = mergedata_san[mergedata_san.country == 'Denmark']
+
+# Add an x value for date which counts the length
+mergedata_san['x'] = np.arange(len(mergedata_san))
+# print(mergedata_san.head(10)
+
+lin_reg = LinearRegression()
+lin_reg.fit([mergedata_san['x']], [mergedata_san['vaccinated_percent']])
+
+# LINEAR REGRESSION
+def linear_regression():
+    plt.scatter([mergedata_san['x']], [mergedata_san['vaccinated_percent']], color='red')
+    plt.plot([mergedata_san['x']], lin_reg.predict([mergedata_san['x']]), color='blue')
+    plt.title('Linear Regression')
+    plt.xlabel('Date')
+    plt.ylabel('Vaccinated percent')
+    plt.show()
+    return
+
+linear_regression()
+
+
 
 
 # Graph for specific country
@@ -143,26 +167,5 @@ fig.update_layout(
 
 fig.show()
 
-
-
-
-"""
-#creating the model
-model=LinearRegression()
-#print(type(vacdata['date']))
-X = mergedata.san[['people_fully_vaccinated']]
-y = mergedata.san['date']
-model.fit(X, y)
-print(model.coef_)
-print(model.intercept_)
-# 1 year prediction
-pr = model.predict(X)
-fig, ax = plt.subplots(figsize=(15, 5))
-plt.title('The Best Fit Line: ')
-plt.scatter(X=mergedata.san['people_fully_vaccinated'], y=mergedata.san['date'])
-plt.plot(X, pr)
-predictsomething = model.predict([[100000]])
-print(predictsomething)
-"""
 
 root.mainloop()
