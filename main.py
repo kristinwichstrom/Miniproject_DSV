@@ -96,7 +96,7 @@ mb = OptionMenu(mainframe, tkvar, *sorted_pop)
 
 message.grid(row=1, column=0)
 mb.grid(row=4, column=0)
-
+#
 # Make the value change
 def change_dropdown(*args):
     print(tkvar.get())
